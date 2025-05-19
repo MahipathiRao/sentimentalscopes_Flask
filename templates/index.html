@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SentimentScopes</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='static/style.css') }}">
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+        }
+
+        #background-video {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            min-width: 100%;
+            min-height: 100%;
+            z-index: -1;
+            object-fit: cover;
+            filter: brightness(0.4);
+        }
+
+        .overlay {
+            position: relative;
+            min-height: 100vh;
+            padding-top: 5%;
+            color: white;
+        }
+
+        .gradient-text {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, #ff6ec4, #7873f5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradient-shift 5s infinite alternate;
+        }
+
+        @keyframes gradient-shift {
+            from {
+                background-position: 0%;
+            }
+            to {
+                background-position: 100%;
+            }
+        }
+
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            transition: all 0.3s ease;
+        }
+
+        .glassmorphism:hover {
+            transform: scale(1.02);
+        }
+
+        .btn-analyze, .btn-download {
+            background: linear-gradient(135deg, #ff6ec4, #7873f5);
+            border: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 110, 196, 0.4);
+        }
+
+        .btn-analyze:hover, .btn-download:hover {
+            box-shadow: 0 6px 20px rgba(120, 115, 245, 0.6);
+            transform: scale(1.05);
+        }
+
+        .form-label {
+            font-weight: 600;
+        }
+
+        .alert {
+            backdrop-filter: blur(5px);
+            background-color: rgba(255, 0, 0, 0.3);
+        }
+
+        .card-body h3 {
+            font-weight: 700;
+            color: #ffebcd;
+        }
+
+        @media (max-width: 768px) {
+            .gradient-text {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background Video -->
+   <video autoplay muted loop id="background-video">
+    <source src="{{ url_for('static', filename='bgv1.mp4') }}" type="video/mp4">
+    Your browser does not support the video tag.
+</video>
+
+
+    <!-- Main Content Overlay -->
+    <div class="overlay">
+        <div class="container">
+            <h1 class="text-center mb-4 gradient-text">SentimentScopes</h1>
+
+            <!-- Upload Card -->
+            <div class="card glassmorphism mb-4">
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="pdf_file" class="form-label">Upload a PDF for Sentiment Analysis</label>
+                            <input type="file" class="form-control" id="pdf_file" name="pdf_file" accept=".pdf" required>
+                        </div>
+                        <button type="submit" class="btn btn-analyze w-100">🔍 Analyze</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Error Alert -->
+            {% if error %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ error }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endif %}
+
+            <!-- Result Section -->
+            {% if success %}
+                <div class="card glassmorphism">
+                    <div class="card-body">
+                        <h3 class="mb-3">Sentiment Analysis Results</h3>
+                        <div class="table-responsive">
+                            {{ results | safe }}
+                        </div>
+                        <a href="{{ url_for('download_excel') }}" class="btn btn-download mt-3">⬇ Download Results</a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
